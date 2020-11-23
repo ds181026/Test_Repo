@@ -2,7 +2,21 @@ import random
 import string
 import re
 
-def random_spell_mistake(sentence, p = 0.1): #p is for the probability that the word gets misspelled
+import sys
+sys.path
+
+import RegEx_Text
+
+x = 1
+
+dir()
+
+def random_spell_mistake(sentence, p = 0.1):#p is for the probability that the word gets misspelled
+
+'''
+
+
+'''
     letters = string.ascii_lowercase
     words = sentence.split()
     new_sent = []
@@ -100,17 +114,6 @@ def remove_letter(text):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 number_text = '''
 this are the pills i need
 50mg of this
@@ -145,9 +148,146 @@ print(calculate_grams(gram_text))
 def change_units(text):
     gram_re = r'[0-9]+\s?(g|gram|mg|miligram|kg|kilogram)'
     liter_re = r'[0-9]+\s?(l|liter|ml|mililiter|dl|deciliter|cl|centiliter)'
-    new_text = re.sub(gram_re, calculate_grams(gram_re), text)
+    new_text = re.sub(gram_re, '12', text)
     return(new_text)
         
 change_units(number_text)
 
-#https://linuxhint.com/python_string_replacement/
+def LD(s, t):
+    if s == "":
+        return len(t)
+    if t == "":
+        return len(s)
+    if s[-1] == t[-1]:
+        cost = 0
+    else:
+        cost = 1
+    res = min([LD(s[:-1], t)+1, #remove
+               LD(s, t[:-1])+1, #insert
+               LD(s[:-1], t[:-1]) + cost]) #replace (if cost = 1) or do nothing
+
+    return res
+
+print(LD("Andi", "Brai"))
+
+def iterative_levenshtein(s, t):
+    """ 
+        iterative_levenshtein(s, t) -> ldist
+        ldist is the Levenshtein distance between the strings 
+        s and t.
+        For all i and j, dist[i,j] will contain the Levenshtein 
+        distance between the first i characters of s and the 
+        first j characters of t
+    """
+
+    rows = len(s)+1
+    cols = len(t)+1
+    dist = [[0 for x in range(cols)] for x in range(rows)]
+
+    # source prefixes can be transformed into empty strings 
+    # by deletions:
+    for i in range(1, rows):
+        dist[i][0] = i
+
+    # target prefixes can be created from an empty source string
+    # by inserting the characters
+    for i in range(1, cols):
+        dist[0][i] = i
+        
+    for col in range(1, cols):
+        for row in range(1, rows):
+            if s[row-1] == t[col-1]:
+                cost = 0
+            else:
+                cost = 1
+            dist[row][col] = min(dist[row-1][col] + 1,      # deletion
+                                 dist[row][col-1] + 1,      # insertion
+                                 dist[row-1][col-1] + cost) # substitution
+
+    for r in range(rows):
+        print(dist[r])
+    
+ 
+    return dist[row][col]
+
+print(iterative_levenshtein("Andi", "Brai"))
+
+
+
+
+def generate_power(exponent):
+    def decorator(f):
+        def inner(*args):
+            result = f(*args)
+            return exponent**result
+        return inner
+    return decorator
+
+
+@generate_power(2)
+def raise_two(n):
+    return n
+
+print(raise_two(7))
+
+
+@generate_power(3)
+def raise_three(n):
+    return n
+
+print(raise_two(5))
+
+import random
+from nltk import word_tokenize
+
+def letter_skip(token_list, p=0.01):
+    final_list = []
+    for token in token_list:
+        word_list = []
+        for letter in token:
+            if random.uniform(0,1) < p:
+                letter = ''
+            word_list.append(letter)
+            new_word = ''.join(word_list)
+        final_list.append(new_word)
+    return final_list
+
+text = 'Actually, this should work straight away. But maybe I did forget about something. So far, no mistake has occured, so I will extend the length of the text'
+tokens = word_tokenize(text)
+skipped_letter_words = letter_skip(tokens, p=0.05)
+print(skipped_letter_words)
+
+#clear console
+
+def letter_flip(token_list, p=0.01):
+    final_list = []
+    for token in token_list:
+        word_list = list(token)
+        if len(word_list) > 2:
+            if random.uniform(0,1) < p:
+                idx = random.randint(1,len(word_list)-1)
+                word_list[idx], word_list[idx-1] = word_list[idx-1], word_list[idx]
+        new_word = ''.join(word_list)
+        final_list.append(new_word)
+    return final_list
+
+print(letter_flip(tokens, p=0.2))
+  
+
+    
+    
+def double_letter(token_list, p=0.01):
+  final_list = []
+  for token in token_list:
+      word_list = []
+      for letter in token:
+          if random.uniform(0,1) < p:
+              letter = 2*letter
+          word_list.append(letter)
+          new_word = ''.join(word_list)
+      final_list.append(new_word)
+  return final_list
+
+doubled= double_letter(tokens, 0.05)
+print(doubled)
+    
